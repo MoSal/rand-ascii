@@ -1,0 +1,12 @@
+[package]
+name = "rand-ascii"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fastrand = "2.0.1"
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+incremental = false

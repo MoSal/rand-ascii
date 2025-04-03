@@ -24,9 +24,8 @@ fn main() {
 
         let stdout = io::stdout();
         let mut stdout = stdout.lock();
-        //let mut buf = [0u8; 1];
         let mut buf = [0u8; 1];
-        for _ in 0..(n.max(1)-1) {
+        for _ in 0..n {
             let _ = stdout.write(rand_ch(' '..='~').encode_utf8(&mut buf).as_bytes());
         }
         let _ = stdout.write(b"\n");

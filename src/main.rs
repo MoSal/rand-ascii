@@ -1,8 +1,6 @@
-use std::env;
+use std::{env, iter};
 use std::io::{self, Write};
 use std::process;
-use fastrand::char as rand_ch;
-use fastrand::usize as rand_usize;
 
 fn parse_size(n_str: &str) -> Option<usize> {
     let n = match n_str.as_bytes().last() {
@@ -22,6 +20,7 @@ fn usage(arg0: &str, exit: i32) {
 fn main() {
     let mut args = env::args();
     let arg0 = args.next().unwrap();
+
     let Some(n_str) = args.next() else {
         return usage(&arg0, 1);
     };
@@ -31,13 +30,39 @@ fn main() {
     }
 
     const SZ_MSG: &str = "expected a number optionally followed by 'k' or 'm' or 'g'";
-    let n = parse_size(&n_str).expect(SZ_MSG);
+
+    let mut n_str_split = n_str.split('-');
+    let n1_str = n_str_split.next().expect("impossible");
+    let n2_str_opt = n_str_split.next();
+
+    if n_str_split.next().is_some() {
+        usage(&arg0, 3);
+    }
+
+    let n1 = parse_size(&n1_str).expect(SZ_MSG);
+
+    if n1 == 0 {
+        eprintln!("n must be > 0");
+        usage(&arg0, 4);
+    }
+
+    if let Some(n2_str) = n2_str_opt {
+    } else {
+    }
+
+    let ascii_range = b' '..=b'~';
+
+    let ascii_vec = iter::repeat_with(|| fastrand::choice(ascii_range.clone()).unwrap())
+        .take(n1)
+        .collect::<Vec<_>>();
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
-    let mut buf = [0u8; 1];
-    for _ in 0..n {
-        let _ = stdout.write(rand_ch(' '..='~').encode_utf8(&mut buf).as_bytes());
-    }
-    let _ = stdout.write(b"\n");
+
+    stdout.write_all(&ascii_vec)
+        .expect("failed to write output");
+    let _ = stdout.write(b"\n")
+        .expect("failed to write final \\n");
+    stdout.flush()
+        .expect("failed to flush output");
 }

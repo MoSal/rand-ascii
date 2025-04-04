@@ -75,8 +75,13 @@ fn main() {
             usage(&arg0, 5);
         }
 
-        let line_length_range = short..long+1; // +1 because no ExactSizeIterator for inclusive
-                                               // usize ranges for some reason.
+        if long == usize::MAX {
+            eprintln!("long({long}) must be < {}", usize::MAX);
+            usage(&arg0, 5);
+        }
+
+        let line_length_range = short..long+1;
+
         let line_lengths = iter::repeat_with(|| fastrand::choice(line_length_range.clone()).unwrap())
             .take(n);
 
